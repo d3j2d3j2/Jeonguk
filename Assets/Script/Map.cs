@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class Map : MonoBehaviour
 {
 	public enum LandType
@@ -22,7 +23,7 @@ public class Map : MonoBehaviour
 		Region3,
 		Festival,
 		Turnover
-    }
+	}
 
 	private const char USUAL = 'u';
 	private const char GOLDKEY = 'g';
@@ -38,6 +39,14 @@ public class Map : MonoBehaviour
 		public Monopoly.PlayerType owner = Monopoly.PlayerType.None;
 		public bool[] build = { false, false, false, false };
 		public int[] price = { 0, 0, 0, 0 };
+		public GameObject[] buildingPrefab = new GameObject[4];
+		public Land()
+        {
+			for(int i=0; i<buildingPrefab.Length; i++)
+            {
+				buildingPrefab[i] = null;
+            }
+        }
 		
 		public int landNum = -1;
 		public int GetFee()
@@ -93,6 +102,8 @@ public class Map : MonoBehaviour
 	public static Land[] landArray;
 	public static int mapSize;
 	public TextAsset mapAsset;
+
+	public GameObject[] houses = new GameObject[4];
 
 	public int NumLandSeason(int season)
 	{
@@ -157,8 +168,8 @@ public class Map : MonoBehaviour
 		int sum2 = 0;
 		for(int i= region*(mapSize/8); i< region*(mapSize/8)+mapSize/8; i++)
         {
-			if (Map.landArray[i].owner == Monopoly.PlayerType.Player1) sum1++;
-			else if (Map.landArray[i].owner == Monopoly.PlayerType.Player2) sum2++;
+			if (landArray[i].type == LandType.Usual && landArray[i].owner == Monopoly.PlayerType.Player1) sum1++;
+			else if (landArray[i].type == LandType.Usual && landArray[i].owner == Monopoly.PlayerType.Player2) sum2++;
 		}
 		if (sum1 == NumLandRegion(region)) return Monopoly.PlayerType.Player1;
 		else if (sum2 == NumLandRegion(region)) return Monopoly.PlayerType.Player2;
@@ -278,6 +289,48 @@ public class Map : MonoBehaviour
 				Map.landArray[i].build = null;
 				Map.landArray[i].price = null;
             }
+		}
+	}
+
+	void Start()
+    {
+		
+    }
+
+	void Update()
+    {
+
+	}
+
+	void BuildCheck()
+    {
+		for (int i = 0; i < landArray.Length; i++)
+		{
+			GameObject land = GameObject.Find("" + i);
+			Vector3 basePos = land.transform.position;
+
+			for (int j = 0; j < landArray[i].build.Length; j++)
+			{
+				if (landArray[i].build[j] == true)
+				{
+					Debug.Log(i + "," + j + "built");
+					if (landArray[i].buildingPrefab[j] == null)
+					{
+
+						basePos += new Vector3(-2 + j, 0, 0);
+						landArray[i].buildingPrefab[j] = Instantiate(houses[j], basePos, Quaternion.identity, land.transform);
+					}
+				}
+				else
+				{
+					if (landArray[i].buildingPrefab[j] != null)
+					{
+						Destroy(landArray[i].buildingPrefab[j]);
+						landArray[i].buildingPrefab[j] = null;
+
+					}
+				}
+			}
 		}
 	}
 }

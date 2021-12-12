@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-	public const int StartMoney = 1000000;
+	public const int StartMoney = 10000;
 	public int currentMoney;
 	public int position;
 	public Map map;
